@@ -43,3 +43,42 @@ async def check_style(input_text: TextInput):
         })
 
     return {"original_text": text, "suggestions": suggestions}
+
+@app.post("/check-passive-voice")
+async def check_passive_voice(input_text: TextInput):
+    passive_phrases = ["was done", "is being", "has been", "will be"]
+    issues = []
+
+    for phrase in passive_phrases:
+        if phrase in input_text.text:
+            issues.append({
+                "sentence": input_text.text,
+                "issue": f"Passive voice detected: '{phrase}'",
+                "suggestion": "Consider rewording to active voice."
+            })
+
+    return {"original_text": input_text.text, "passive_issues": issues}
+
+@app.post("/check-tone")
+async def check_tone(input_text: TextInput):
+    tone_issues = []
+    if "ASAP" in input_text.text or "you must" in input_text.text.lower():
+        tone_issues.append({
+            "issue": "Tone may sound too aggressive or demanding.",
+            "suggestion": "Use polite or collaborative language.",
+            "explanation": "IBM style prefers professional and respectful tone."
+        })
+
+    return {"original_text": input_text.text, "tone_issues": tone_issues}
+
+@app.post("/check-clarity")
+async def check_clarity(input_text: TextInput):
+    issues = []
+    if len(input_text.text.split()) > 30:
+        issues.append({
+            "sentence": input_text.text,
+            "issue": "Sentence may be too long or complex.",
+            "suggestion": "Break it into shorter sentences for clarity."
+        })
+
+    return {"original_text": input_text.text, "clarity_issues": issues}
